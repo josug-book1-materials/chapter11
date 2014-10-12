@@ -1,0 +1,29 @@
+---
+- hosts: dbs
+  remote_user: root
+
+  vars:
+    mysql_dir: /var/lib/mysql
+    mysql_vol: /dev/mysql_vg/mysql_vol01
+    mysql_snap: mysql_bk_snap01
+    mysql_snap_size: 100m
+
+  tasks:
+  - name: stop mysqld
+    service: name=mysqld state=stopped
+    tags: snapshot
+  - name: umount mysql_dir
+    mount: name="{{ mysql_dir }}" src="{{ mysql_vol }}" fstype=ext4 state=unmounted
+    tags: snapshot
+  - name: create snapshot on lvm
+    command: lvcreate -s "{{ mysql_vol }}" -L "{{ mysql_snap_size }}" -n "{{ mysql_snap }}"
+    tags: snapshot
+  - name: mount mysql_dir
+    mount: name="{{ mysql_dir }}" src="{{ mysql_vol }}" fstype=ext4 state=mounted
+    tags: snapshot
+  - name: start mysqld
+    service: name=mysqld state=started
+    tags: snapshot
+#
+# [EOF]
+#

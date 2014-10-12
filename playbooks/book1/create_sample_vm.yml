@@ -1,0 +1,84 @@
+---
+#
+# Usage: ansible-playbook -i inventory -e target=web|app|dbs create_sample_vm.yml
+# Required: ansible-v1.8 or later and openrc
+#
+- hosts: localhost
+
+  vars:
+    auth:
+      url: "{{ lookup('env', 'OS_AUTH_URL') }}"
+      region_name: "{{ lookup('env', 'OS_REGION_NAME') }}"
+      tenant_name: "{{ lookup('env', 'OS_TENANT_NAME') }}"
+      username: "{{ lookup('env', 'OS_USERNAME') }}"
+      password: "{{ lookup('env', 'OS_PASSWORD') }}"
+    networks:
+      os_dmz_net: "{{ lookup('env', 'OS_DMZ_NET') }}"
+      os_app_net: "{{ lookup('env', 'OS_APP_NET') }}"
+      os_dbs_net: "{{ lookup('env', 'OS_DBS_NET') }}"
+    spec:
+      web:
+        flavor_ram: 1024
+        flavor_name: "standard.xsmall"
+        image_name: "centos"
+        key_name: "key-for-ansible"
+        secgroups: "sg-all-from-console,sg-web-from-internet,sg-all-from-app-net"
+        availability_zone: "az1"
+        networks:
+        - net-id: "{{ networks.os_dmz_net }}"
+        - net-id: "{{ networks.os_app_net }}"
+        floating_ip: yes
+      app:
+        flavor_ram: 1024
+        flavor_name: "standard.xsmall"
+        image_name: "centos"
+        key_name: "key-for-ansible"
+        secgroups: "sg-all-from-console,sg-all-from-app-net,sg-all-from-dbs-net"
+        availability_zone: "az1"
+        networks:
+        - net-id: "{{ networks.os_dmz_net }}"
+        - net-id: "{{ networks.os_app_net }}"
+        - net-id: "{{ networks.os_dbs_net }}"
+        floating_ip: no
+      dbs:
+        flavor_ram: 1024
+        flavor_name: "standard.xsmall"
+        image_name: "centos"
+        key_name: "key-for-ansible"
+        secgroups: "sg-all-from-console,sg-all-from-dbs-net"
+        availability_zone: "az1"
+        networks:
+        - net-id: "{{ networks.os_dmz_net }}"
+        - net-id: "{{ networks.os_dbs_net }}"
+        floating_ip: no
+
+  tasks:
+  - name: get uuid for generate hostname
+    shell: /usr/bin/uuidgen
+    register: result_uuid
+    when: target in ["web", "app", "dbs"]
+  - name: create {{ target }}-server on nova-compute
+    nova_compute:
+      state: present
+      auth_url: "{{ auth.url }}"
+      region_name: "{{ auth.region_name }}"
+      login_tenant_name: "{{ auth.tenant_name }}"
+      login_username: "{{ auth.username }}"
+      login_password: "{{ auth.password }}"
+      auto_floating_ip: "{{ spec[target].floating_ip }}"
+      availability_zone: "{{ spec[target].availability_zone }}"
+      flavor_ram: "{{ spec[target].flavor_ram }}"
+      flavor_include: "{{ spec[target].flavor_name }}"
+      image_name: "{{ spec[target].image_name }}"
+      key_name: "{{  spec[target].key_name }}"
+      name: "{{ target }}-{{ result_uuid.stdout }}"
+      nics: "{{ spec[target].networks }}"
+    register: result_nova_compute
+    when: target in ["web", "app", "dbs"]
+  - name: show network info
+    debug: msg="{{ result_nova_compute.info.addresses }}"
+    when: target in ["web", "app", "dbs"]
+
+#
+# [EOF]
+#

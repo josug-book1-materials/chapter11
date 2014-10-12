@@ -1,0 +1,14 @@
+---
+#
+# Usage: ansible-playbook -i inventory -e target=snapshot|backup db_backup.yml
+#
+- include: create_snapshot.yml
+  tags: snapshot
+
+- include: backup_snapshot.yml
+  tags: backup
+
+- include: restart_rest_service.yml
+  tags:
+  - snapshot
+  - backup

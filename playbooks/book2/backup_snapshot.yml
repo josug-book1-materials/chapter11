@@ -1,0 +1,57 @@
+---
+- hosts: dbs
+  remote_user: root
+
+  vars:
+    now: "{{ lookup('pipe', 'date +%s') }}"
+    backup_dev: /dev/vde1
+    snapshot_dev: /dev/mysql_vg/mysql_bk_snap01
+    backup_mountpoint: /backup
+    snapshot_mountpoint: /snapshot
+
+  tasks:
+  - name: make directory
+    command: mkdir -p {{ backup_mountpoint }} {{ snapshot_mountpoint }}
+    tags: backup
+  - name: mount backup
+    mount:
+      name: "{{ backup_mountpoint }}"
+      src: "{{ backup_dev }}"
+      fstype: ext4
+      opts: rw
+      state: mounted
+    tags: backup
+  - name: mount snapshot
+    mount:
+      name: "{{ snapshot_mountpoint }}"
+      src: "{{ snapshot_dev }}"
+      fstype: ext4
+      opts: ro
+      state: unmounted
+    tags: backup
+  - name: archive database files to "{{ backup_mountpoint }}"
+    shell: cd "{{ backup_mountpoint }}" && tar zcf backup_"{{ now }}".tar.gz "{{ snapshot_mountpoint }}"
+    tags: backup
+  - name: umount snapshot
+    mount:
+      name: "{{ snapshot_mountpoint }}"
+      src: "{{ snapshot_dev }}"
+      fstype: ext4
+      opts: ro
+      state: unmounted
+    tags: backup
+  - name: umount backup
+    mount:
+      name: "{{ backup_mountpoint }}"
+      src: "{{ backup_dev }}"
+      fstype: ext4
+      opts: rw
+      state: mounted
+    tags: backup
+  - name: remove snapshot
+    command: lvremove -f "{{ snapshot_dev }}"
+
+
+#
+# [EOF]
+#

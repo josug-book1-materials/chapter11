@@ -1,0 +1,17 @@
+---
+- hosts: app
+  remote_user: root
+
+  vars:
+    app_path: /root/sample-app/server-setup/rest.init.sh
+
+  tasks:
+  - name: restart rest app
+    command: sh "{{ app_path }}" restart
+    tags:
+    - snapshot
+    - backup
+
+#
+# [EOF]
+#
