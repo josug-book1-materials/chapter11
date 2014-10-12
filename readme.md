@@ -16,10 +16,11 @@ ansible-playbook -i sample_app_inventory.py -e target=web|app|dbs book1/create_s
 ## playbooks/book2
 データベースサーバグループ(dbs)に所属するサーバ上で稼働しているsample-app用のデータベースをバックアップします。
 プレイブックは４つに分かれており、それぞれ以下のような役割をもっています。
-1. create_snapshot.yml - LVMを利用したスナップショットを作成します。 
-1. backup_snapshot.yml - スナップショット上のデータベースファイルをアーカイブしてバックアップします。
-1. restart_rest_service.yml - appサーバ上のrestサービスをリスタートします。
-1. db_backup.yml - 他の３つのプレイブックをインクルードして順に実行するプレイブック本体です。
+  
+1. create_snapshot.yml - LVMを利用したスナップショットを作成します。   
+1. backup_snapshot.yml - スナップショット上のデータベースファイルをアーカイブしてバックアップします。  
+1. restart_rest_service.yml - appサーバ上のrestサービスをリスタートします。  
+1. db_backup.yml - 他の３つのプレイブックをインクルードして順に実行するプレイブック本体です。  
 
 ```
 [前提条件]
