@@ -27,7 +27,7 @@
       src: "{{ snapshot_dev }}"
       fstype: ext4
       opts: ro
-      state: unmounted
+      state: mounted
     tags: backup
   - name: archive database files to "{{ backup_mountpoint }}"
     shell: cd "{{ backup_mountpoint }}" && tar zcf backup_"{{ now }}".tar.gz "{{ snapshot_mountpoint }}"
