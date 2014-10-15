@@ -50,6 +50,7 @@
     tags: backup
   - name: remove snapshot
     command: lvremove -f "{{ snapshot_dev }}"
+    tags: backup
 
 
 #
