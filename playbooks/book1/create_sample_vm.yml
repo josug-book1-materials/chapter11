@@ -20,7 +20,7 @@
       web:
         flavor_ram: 1024
         flavor_name: "standard.xsmall"
-        image_name: "centos"
+        image_name: "centos-base"
         key_name: "key-for-ansible"
         secgroups: "sg-all-from-console,sg-web-from-internet,sg-all-from-app-net"
         availability_zone: "az1"
@@ -31,7 +31,7 @@
       app:
         flavor_ram: 1024
         flavor_name: "standard.xsmall"
-        image_name: "centos"
+        image_name: "centos-base"
         key_name: "key-for-ansible"
         secgroups: "sg-all-from-console,sg-all-from-app-net,sg-all-from-dbs-net"
         availability_zone: "az1"
@@ -43,7 +43,7 @@
       dbs:
         flavor_ram: 1024
         flavor_name: "standard.xsmall"
-        image_name: "centos"
+        image_name: "centos-base"
         key_name: "key-for-ansible"
         secgroups: "sg-all-from-console,sg-all-from-dbs-net"
         availability_zone: "az1"
