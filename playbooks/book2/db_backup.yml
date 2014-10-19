@@ -5,10 +5,8 @@
 - include: create_snapshot.yml
   tags: snapshot
 
+- include: restart_rest_service.yml
+  tags: snapshot
+
 - include: backup_snapshot.yml
   tags: backup
-
-- include: restart_rest_service.yml
-  tags:
-  - snapshot
-  - backup
