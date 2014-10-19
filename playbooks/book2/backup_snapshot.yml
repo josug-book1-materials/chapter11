@@ -4,7 +4,7 @@
 
   vars:
     now: "{{ lookup('pipe', 'date +%s') }}"
-    backup_dev: /dev/vde1
+    backup_dev: /dev/vdd1
     snapshot_dev: /dev/mysql_vg/mysql_bk_snap01
     backup_mountpoint: /backup
     snapshot_mountpoint: /snapshot
