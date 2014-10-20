@@ -6,6 +6,7 @@
 - hosts: localhost
 
   vars:
+    ansible_python_interpreter: "{{ lookup('pipe', 'which python') }}"
     auth:
       url: "{{ lookup('env', 'OS_AUTH_URL') }}"
       region_name: "{{ lookup('env', 'OS_REGION_NAME') }}"
