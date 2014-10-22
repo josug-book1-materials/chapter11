@@ -17,6 +17,8 @@
       os_dmz_net: "{{ lookup('env', 'OS_DMZ_NET') }}"
       os_app_net: "{{ lookup('env', 'OS_APP_NET') }}"
       os_dbs_net: "{{ lookup('env', 'OS_DBS_NET') }}"
+      os_ext_net_list:
+      - "Ext-Net"
     spec:
       web:
         flavor_ram: 1024
@@ -58,7 +60,7 @@
     shell: /usr/bin/uuidgen
     register: result_uuid
     when: target in ["web", "app", "dbs"]
-  - name: create {{ target }}-server on nova-compute
+  - name: create {{ target }}-server on nova-compute with floating_ip
     nova_compute:
       state: present
       auth_url: "{{ auth.url }}"
@@ -66,7 +68,24 @@
       login_tenant_name: "{{ auth.tenant_name }}"
       login_username: "{{ auth.username }}"
       login_password: "{{ auth.password }}"
-      auto_floating_ip: "{{ spec[target].floating_ip }}"
+      availability_zone: "{{ spec[target].availability_zone }}"
+      flavor_ram: "{{ spec[target].flavor_ram }}"
+      flavor_include: "{{ spec[target].flavor_name }}"
+      floating_ip_pools: "{{ networks.os_ext_net_list }}"
+      image_name: "{{ spec[target].image_name }}"
+      key_name: "{{  spec[target].key_name }}"
+      name: "{{ target }}-{{ result_uuid.stdout }}"
+      nics: "{{ spec[target].networks }}"
+      security_groups: "{{ spec[target].secgroups }}"
+    when: (target in ["web","app","dbs"]) and (spec[target].floating_ip)
+  - name: create {{ target }}-server on nova-compute without floating_ip
+    nova_compute:
+      state: present
+      auth_url: "{{ auth.url }}"
+      region_name: "{{ auth.region_name }}"
+      login_tenant_name: "{{ auth.tenant_name }}"
+      login_username: "{{ auth.username }}"
+      login_password: "{{ auth.password }}"
       availability_zone: "{{ spec[target].availability_zone }}"
       flavor_ram: "{{ spec[target].flavor_ram }}"
       flavor_include: "{{ spec[target].flavor_name }}"
@@ -74,11 +93,8 @@
       key_name: "{{  spec[target].key_name }}"
       name: "{{ target }}-{{ result_uuid.stdout }}"
       nics: "{{ spec[target].networks }}"
-    register: result_nova_compute
-    when: target in ["web", "app", "dbs"]
-  - name: show network info
-    debug: msg="{{ result_nova_compute.info.addresses }}"
-    when: target in ["web", "app", "dbs"]
+      security_groups: "{{ spec[target].secgroups }}"
+    when: (target in ["web","app","dbs"]) and (not spec[target].floating_ip)
 
 #
 # [EOF]
