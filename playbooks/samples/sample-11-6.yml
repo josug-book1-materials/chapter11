@@ -1,0 +1,10 @@
+---
+- hosts: "{{ target }}"
+  tasks:
+  - name: reboot server
+    command: /sbin/shutdown -r +1
+    sudo: yes
+  - name: wait for shutdown process
+    local_action: pause minutes=1
+  - name: check the server to start up
+    local_action: wait_for port=22 host="{{ inventory_hostname }}" delay=10 timeout=600

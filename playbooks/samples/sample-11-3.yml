@@ -1,0 +1,23 @@
+---
+- hosts: "{{ target }}"
+  vars:
+    username: ansible
+  vars_prompt:
+  - name: "password"
+    prompt: "Enter a new user's password"
+    private: yes
+    encrypt: "md5_crypt"
+    confirm: yes
+    salt_size: 7
+  tasks:
+  - name: add a new user on target host
+    user:
+      name: "{{ username }}"
+      password: "{{ password }}"
+      group: wheel
+    sudo: yes
+  - name: add a publickey on localhost to authorized_keys on target host
+    authorized_key:
+      user: "{{ username }}"
+      key: "{{ lookup('file', '/root/.ssh/id_rsa.pub') }}"
+    sudo: yes

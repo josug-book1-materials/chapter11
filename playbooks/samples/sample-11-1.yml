@@ -1,0 +1,17 @@
+---
+- hosts: "{{ target }}"
+  vars:
+    hostname: ansible-host1
+  tasks:
+  - name: get hostname
+    shell: hostname
+    register: result
+  - name: set hostname
+    hostname:
+      name: "{{ hostname }}"
+    sudo: yes
+    notify: show hostname
+  handlers:
+  - name: show hostname
+    debug:
+      msg: "before={{ result.stdout }} after={{ hostname }}"
