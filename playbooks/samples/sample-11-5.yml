@@ -1,0 +1,20 @@
+---
+- hosts: "{{ target }}"
+  vars:
+    db_addr: 127.0.0.1
+  tasks:
+  - name: replace my.cnf
+    template:
+      src: my.cnf.j2
+      dest: /etc/my.cnf
+      owner: root
+      group: root
+      mode: 0644
+    notify: restart database
+    sudo: yes
+  handlers:
+  - name: restart database
+    service:
+      state: restarted
+      name: mysqld
+    sudo: yes

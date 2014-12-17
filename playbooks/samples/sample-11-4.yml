@@ -1,0 +1,10 @@
+---
+- hosts: "{{ target }}"
+  tasks:
+  - name: grant privileges to do the sudo command to the wheel group
+    lineinfile:
+      state: present
+      dest: /etc/sudoers
+      regexp: '^%wheel'
+      line: '%wheel ALL=(ALL) ALL'
+  sudo: yes
