@@ -7,7 +7,7 @@
 
   tasks:
   - name: restart rest app
-    command: sh "{{ app_path }}" restart
+    command: nohup sh "{{ app_path }}" restart
     tags:
     - snapshot
     - backup
