@@ -1,0 +1,34 @@
+== Launch one instance ==
+
+  ansible-playbook -i ./dynamic_inventory/sample_app_inventory.py -vv create_sample_vm.yml -e target=dbs
+  ansible-playbook -i ./dynamic_inventory/sample_app_inventory.py -vv create_sample_vm.yml -e target=app
+  ansible-playbook -i ./dynamic_inventory/sample_app_inventory.py -vv create_sample_vm.yml -e target=web
+  ansible-playbook -i ./dynamic_inventory/sample_app_inventory.py -vv create_sample_vm.yml -e target=lbs
+
+== Install application to an instance ==
+
+DBS, APP, WEB:
+  
+  ansible-playbook -i ./dynamic_inventory/sample_app_inventory.py -vv install_sample_app.yml
+
+LBS:
+
+  ansible-playbook -i ./dynamic_inventory/sample_app_inventory.py -vv install_lbs.yml
+
+== Launch a set of instances ==
+
+Launch DBS, APP, 4 WEB and 1 LB instances
+
+  ansible-playbook -i ./dynamic_inventory/sample_app_inventory.py -vv create_all.yml
+
+Launch DBS, APP and 1 WEB (no LB)
+
+  ansible-playbook -i ./dynamic_inventory/sample_app_inventory.py -vv create_all.yml -e web_count=1 -e lbs_count=0
+ 
+Launch DBS, APP, 2 WEB and 1 LB
+ 
+  ansible-playbook -i ./dynamic_inventory/sample_app_inventory.py -vv create_all.yml -e web_count=2
+
+== Install applications to all instances ==
+
+  ansible-playbook -i ./dynamic_inventory/sample_app_inventory.py -vv install_all.yml
