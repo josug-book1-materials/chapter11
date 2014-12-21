@@ -1,0 +1,46 @@
+---
+#
+# Usage: ansible-playbook -i inventory playbook.yml
+#
+- hosts: lbs
+
+  remote_user: root
+
+  vars:
+    spec:
+      dbs:
+        app_name: "sample-app"
+        project_url: "https://github.com/josug-book1-materials/sample-app.git"
+        init_script: "install_db.sh"
+        init_script_version: "v1.0"
+
+  tasks:
+  - name: change the timezone
+    command: cp /usr/share/zoneinfo/Asia/Tokyo /etc/localtime
+  - name: add nginx repo
+    copy:
+      src: nginx.repo
+      dest: /etc/yum.repos.d/nginx.repo
+  - name: setup load balancer members
+    template:
+      src: lbs.conf.j2
+      dest: /etc/nginx/conf.d/lbs.conf
+    notify: ensure nginx reloaded
+  - name: install nginx
+    yum:
+      name: nginx
+      state: present
+  - name: ensure nginx started
+    service:
+      name: nginx
+      state: started
+
+  handlers:
+  - name: ensure nginx reloaded
+    service:
+      name: nginx
+      state: reloaded
+
+#
+# [EOF]
+#

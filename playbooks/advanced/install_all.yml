@@ -1,0 +1,4 @@
+---
+- include: install_sample_app.yml target=dbs
+- include: install_sample_app.yml target=app
+- include: install_sample_app.yml target=web

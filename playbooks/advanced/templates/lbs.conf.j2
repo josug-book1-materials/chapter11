@@ -1,0 +1,17 @@
+upstream web-server {
+{% if webs %}
+{% for server in webs %}
+    server {{ server }}:80;
+{% endfor %}
+{% else %}
+    server 127.0.0.1:80 down;
+{% endif %}
+}
+
+server {
+    listen 80 default_server;
+    server_name _;
+    location / {
+        proxy_pass http://web-server/;
+    }
+}
