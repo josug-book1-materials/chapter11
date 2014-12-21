@@ -2,4 +2,4 @@
 - include: create_sample_vm.yml target=dbs
 - include: create_sample_vm.yml target=app
 - include: create_sample_vm.yml target=web web_count=4
-- include: create_sample_vm.yml target=lbs lbs_count=1
+- include: create_sample_vm.yml target=lbs

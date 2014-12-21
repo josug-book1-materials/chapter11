@@ -22,7 +22,7 @@
       yes: "{{ networks.os_ext_net_list }}"
       no: null
     instance_counts:
-      lbs: "{{ lbs_count|default(1) }}"
+      lbs: 1
       web: "{{ web_count|default(1) }}"
       app: 1
       dbs: 1
