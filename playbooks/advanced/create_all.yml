@@ -5,3 +5,4 @@
 - include: create_sample_vm.yml target=web
 - include: create_sample_vm.yml target=web
 - include: create_sample_vm.yml target=web
+- include: create_sample_vm.yml target=lbs
