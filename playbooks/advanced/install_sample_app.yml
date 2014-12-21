@@ -41,7 +41,7 @@
     when: target in ["web", "app", "dbs"]
   - name: copy endpoint.conf to web and app server
     template:
-        src: endpoint.conf.j2
+        src: templates/endpoint.conf.j2
         dest: /root/{{ spec[target].app_name }}/endpoint.conf
         owner: root
         group: root
