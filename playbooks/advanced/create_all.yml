@@ -1,5 +1,11 @@
 ---
-- include: create_sample_vm.yml target=dbs
-- include: create_sample_vm.yml target=app
-- include: create_sample_vm.yml target=web web_count=4
-- include: create_sample_vm.yml target=lbs
+- hosts: localhost
+  vars:
+    enable_lb: yes
+    web_count: 4
+  roles:
+  - {role: create_server, "target": "dbs"}
+  - {role: create_server, "target": "app"}
+  - {role: create_server, "target": "web", web_count: 1, when: "not enable_lb|bool"}
+  - {role: create_server, "target": "web", web_count: "{{ web_count }}", when: "enable_lb|bool"}
+  - {role: create_server, "target": "lbs", when: "enable_lb|bool"}

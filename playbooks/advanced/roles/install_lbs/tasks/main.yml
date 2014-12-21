@@ -1,0 +1,20 @@
+---
+- name: change the timezone
+  command: cp /usr/share/zoneinfo/Asia/Tokyo /etc/localtime
+- name: add nginx repo
+  copy:
+    src: nginx.repo
+    dest: /etc/yum.repos.d/nginx.repo
+- name: install nginx
+  yum:
+    name: nginx
+    state: present
+- name: setup load balancer members
+  template:
+    src: lbs.conf.j2
+    dest: /etc/nginx/conf.d/lbs.conf
+  notify: ensure nginx reloaded
+- name: ensure nginx started
+  service:
+    name: nginx
+    state: started

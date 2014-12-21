@@ -17,11 +17,15 @@ LBS:
 
 == Launch a set of instances ==
 
-Launch DBS, APP, 4 WEB and 1 LB instances
+Enable Load Balancer (Launch DBS, APP, 4 WEB and 1 LB instances)
 
   ansible-playbook -i ./dynamic_inventory/sample_app_inventory.py -vv create_all.yml
 
-Launch DBS, APP, 2 WEB and 1 LB
+Disable Load Balancer (Launch DBS, APP, 1 WEB without LB)
+
+  ansible-playbook -i ./dynamic_inventory/sample_app_inventory.py -vv create_all.yml -e enable_lb=0
+
+Enable load balancer with specified numbers of web servers
  
   ansible-playbook -i ./dynamic_inventory/sample_app_inventory.py -vv create_all.yml -e web_count=2
 

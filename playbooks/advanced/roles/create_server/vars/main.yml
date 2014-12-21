@@ -1,0 +1,66 @@
+---
+auth:
+  url: "{{ lookup('env', 'OS_AUTH_URL') }}"
+  region_name: "{{ lookup('env', 'OS_REGION_NAME') }}"
+  tenant_name: "{{ lookup('env', 'OS_TENANT_NAME') }}"
+  username: "{{ lookup('env', 'OS_USERNAME') }}"
+  password: "{{ lookup('env', 'OS_PASSWORD') }}"
+networks:
+  os_dmz_net: "{{ lookup('env', 'OS_DMZ_NET') }}"
+  os_app_net: "{{ lookup('env', 'OS_APP_NET') }}"
+  os_dbs_net: "{{ lookup('env', 'OS_DBS_NET') }}"
+  os_ext_net_list:
+  - "Ext-Net"
+floating_ip_pool_map:
+  yes: "{{ networks.os_ext_net_list }}"
+  no: null
+instance_counts:
+  lbs: 1
+  web: "{{ web_count|default(1) }}"
+  app: 1
+  dbs: 1
+spec:
+  lbs:
+    flavor_ram: 1024
+    flavor_name: "standard.xsmall"
+    image_name: "centos-base"
+    key_name: "key-for-ansible"
+    secgroups: "sg-all-from-console,sg-web-from-internet"
+    availability_zone: "az1"
+    networks:
+    - net-id: "{{ networks.os_dmz_net }}"
+    floating_ip: yes
+  web:
+    flavor_ram: 1024
+    flavor_name: "standard.xsmall"
+    image_name: "centos-base"
+    key_name: "key-for-ansible"
+    secgroups: "sg-all-from-console,sg-web-from-internet,sg-all-from-app-net"
+    availability_zone: "az1"
+    networks:
+    - net-id: "{{ networks.os_dmz_net }}"
+    - net-id: "{{ networks.os_app_net }}"
+    floating_ip: no
+  app:
+    flavor_ram: 1024
+    flavor_name: "standard.xsmall"
+    image_name: "centos-base"
+    key_name: "key-for-ansible"
+    secgroups: "sg-all-from-console,sg-all-from-app-net,sg-all-from-dbs-net"
+    availability_zone: "az1"
+    networks:
+    - net-id: "{{ networks.os_dmz_net }}"
+    - net-id: "{{ networks.os_app_net }}"
+    - net-id: "{{ networks.os_dbs_net }}"
+    floating_ip: no
+  dbs:
+    flavor_ram: 1024
+    flavor_name: "standard.xsmall"
+    image_name: "centos-base"
+    key_name: "key-for-ansible"
+    secgroups: "sg-all-from-console,sg-all-from-dbs-net"
+    availability_zone: "az1"
+    networks:
+    - net-id: "{{ networks.os_dmz_net }}"
+    - net-id: "{{ networks.os_dbs_net }}"
+    floating_ip: no
