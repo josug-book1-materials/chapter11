@@ -21,6 +21,11 @@
     floating_ip_pool_map:
       yes: "{{ networks.os_ext_net_list }}"
       no: null
+    instance_counts:
+      lbs: "{{ lbs_count|default(1) }}"
+      web: "{{ web_count|default(1) }}"
+      app: 1
+      dbs: 1
     spec:
       lbs:
         flavor_ram: 1024
@@ -85,14 +90,14 @@
       availability_zone: "{{ spec[target].availability_zone }}"
       flavor_ram: "{{ spec[target].flavor_ram }}"
       flavor_include: "{{ spec[target].flavor_name }}"
-      #floating_ip_pools: "{{ networks.os_ext_net_list }}"
       floating_ip_pools: "{{ floating_ip_pool_map[spec[target].floating_ip] }}"
       image_name: "{{ spec[target].image_name }}"
       key_name: "{{  spec[target].key_name }}"
-      name: "{{ target }}-{{ result_uuid.stdout }}"
+      name: "{{ target }}-{{ item }}-{{ result_uuid.stdout }}"
       nics: "{{ spec[target].networks }}"
       security_groups: "{{ spec[target].secgroups }}"
     when: (target in ["lbs", "web","app","dbs"])
+    with_sequence: count="{{ instance_counts[target] }}"
 
 #
 # [EOF]
