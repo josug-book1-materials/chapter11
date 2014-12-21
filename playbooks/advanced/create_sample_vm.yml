@@ -18,6 +18,9 @@
       os_dbs_net: "{{ lookup('env', 'OS_DBS_NET') }}"
       os_ext_net_list:
       - "Ext-Net"
+    floating_ip_pool_map:
+      yes: "{{ networks.os_ext_net_list }}"
+      no: null
     spec:
       lbs:
         flavor_ram: 1024
@@ -28,7 +31,7 @@
         availability_zone: "az1"
         networks:
         - net-id: "{{ networks.os_dmz_net }}"
-        floating_ip: no
+        floating_ip: yes
       web:
         flavor_ram: 1024
         flavor_name: "standard.xsmall"
@@ -39,7 +42,7 @@
         networks:
         - net-id: "{{ networks.os_dmz_net }}"
         - net-id: "{{ networks.os_app_net }}"
-        floating_ip: yes
+        floating_ip: no
       app:
         flavor_ram: 1024
         flavor_name: "standard.xsmall"
@@ -71,7 +74,7 @@
     command: /usr/bin/uuidgen
     register: result_uuid
     when: target in ["lbs", "web", "app", "dbs"]
-  - name: create {{ target }}-server on nova-compute with floating_ip
+  - name: create {{ target }}-server on nova-compute
     nova_compute:
       state: present
       auth_url: "{{ auth.url }}"
@@ -82,30 +85,14 @@
       availability_zone: "{{ spec[target].availability_zone }}"
       flavor_ram: "{{ spec[target].flavor_ram }}"
       flavor_include: "{{ spec[target].flavor_name }}"
-      floating_ip_pools: "{{ networks.os_ext_net_list }}"
+      #floating_ip_pools: "{{ networks.os_ext_net_list }}"
+      floating_ip_pools: "{{ floating_ip_pool_map[spec[target].floating_ip] }}"
       image_name: "{{ spec[target].image_name }}"
       key_name: "{{  spec[target].key_name }}"
       name: "{{ target }}-{{ result_uuid.stdout }}"
       nics: "{{ spec[target].networks }}"
       security_groups: "{{ spec[target].secgroups }}"
-    when: (target in ["lbs", "web","app","dbs"]) and (spec[target].floating_ip)
-  - name: create {{ target }}-server on nova-compute without floating_ip
-    nova_compute:
-      state: present
-      auth_url: "{{ auth.url }}"
-      region_name: "{{ auth.region_name }}"
-      login_tenant_name: "{{ auth.tenant_name }}"
-      login_username: "{{ auth.username }}"
-      login_password: "{{ auth.password }}"
-      availability_zone: "{{ spec[target].availability_zone }}"
-      flavor_ram: "{{ spec[target].flavor_ram }}"
-      flavor_include: "{{ spec[target].flavor_name }}"
-      image_name: "{{ spec[target].image_name }}"
-      key_name: "{{  spec[target].key_name }}"
-      name: "{{ target }}-{{ result_uuid.stdout }}"
-      nics: "{{ spec[target].networks }}"
-      security_groups: "{{ spec[target].secgroups }}"
-    when: (target in ["lbs", "web","app","dbs"]) and (not spec[target].floating_ip)
+    when: (target in ["lbs", "web","app","dbs"])
 
 #
 # [EOF]
