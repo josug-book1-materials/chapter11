@@ -1,0 +1,11 @@
+--- display.py.org	2016-02-07 14:09:24.000000000 +0900
++++ display.py	2016-02-07 20:45:27.357321869 +0900
+@@ -307,6 +307,8 @@
+             result = default
+ 
+         if encrypt:
++            # Circular import because encrypt needs a display class
++            from ansible.utils.encrypt import do_encrypt
+             result = do_encrypt(result, encrypt, salt_size, salt)
+ 
+         # handle utf-8 chars
